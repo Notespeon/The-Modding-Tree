@@ -215,6 +215,7 @@ function doReset(layer, force=false) {
 	}
 
 	player.points = (row == 0 ? decimalZero : getStartPoints())
+	player.thinking = true
 
 	for (let x = row; x >= 0; x--) rowReset(x, layer)
 	for (r in OTHER_LAYERS){
