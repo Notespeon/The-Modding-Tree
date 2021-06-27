@@ -5,6 +5,7 @@ addLayer("s", {
     startData() { return {
         unlocked: true,
 		points: new Decimal(0),
+        firstTime: true,
     }},
     color: "#fccd12",
     requires: new Decimal(0), // Can be a function that takes requirement increases into account
@@ -29,7 +30,15 @@ addLayer("s", {
         return
     },
     prestigeNotify() {
-        return false
+        if (player["m"].points == 0) {
+            if (player[this.layer].firstTime == true && player[this.layer].points == 0) {
+                player[this.layer].firstTime = false
+                player.tab = "s"
+            }
+            return true
+        } else {
+            return false
+        }
     },
     row: 5, // Row the layer is in on the tree (0 is the first row)
     hotkeys: [
@@ -39,9 +48,15 @@ addLayer("s", {
     infoboxes: {
         lore: {
             title: "Failure",
-            body() { return "Failure is inevitable; with so many branching paths, it's inevitable that you eventually take the wrong one. However, trying again is simple, and you can learn from your mistakes."}
+            body() { return "Failure is inevitable; with so many branching paths, it's inevitable that you eventually take the wrong one. However, trying again is simple, and you can learn from your mistakes.<br><br> (Press 's' at any time to immediately reset)"}
         }
-    }
+    },
+    tabFormat: [
+        ["infobox", "lore"],
+        "main-display",
+        "prestige-button",
+        "resource-display"
+    ]
 })
 
 addLayer("m", {
@@ -78,12 +93,12 @@ addLayer("m", {
         return false
     },
     passiveGeneration() {
-        let gen = new Decimal(-10)
+        let gen = new Decimal(-5)
         if (hasUpgrade(this.layer, 11)) {
             gen = new Decimal(-2)
         }
         if (hasUpgrade(this.layer, 13)) {
-            gen = new Decimal(0.5)
+            gen = new Decimal(1)
         }
         return gen
     },
@@ -92,17 +107,41 @@ addLayer("m", {
         // {key: "m", description: "M: ???", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
     layerShown(){return true},
-    topsection: [
-        ['display-text', function() {
-            return "<h2>MAINTENANCE</h2><br><br>\n\
-            Life sund and explore...and with a little luck, finally repair the life support systems."
-        }]
+    tabFormat: [
+        ["infobox", "lore1"],
+        ["infobox", "lore2"],
+        ["infobox", "hint1"],
+        "main-display",
+        "resource-display",
+        "upgrades"
     ],
     infoboxes: {
-        lore: {
+        lore1: {
             title: "The Beginning",
-            body() { return "You wake up with visions of beings beyond your comprehensions. The memory of these visions is rapidly fading. You feel the urgent need to remember, that if these memories fade something terrible will happen.<br><br> Your uncle and his friend stare at you from across the room, they both look terrified. You notice from across the room that the door leading outside is slightly ajar. Your uncle's friend is holding a bag with a red cross on it, but he has a loose grip on it."}
-        }
+            body() { return "You wake up with visions of beings beyond your comprehensions. The memory of these visions is rapidly fading. You feel the urgent need to remember, that if these memories fade something terrible will happen.<br><br>Your uncle and his friend stare at you from across the room, they both look terrified. You notice from across the room that the door leading outside is slightly ajar. Your uncle's friend is holding a bag with a red cross on it, but he has a loose grip on it."}
+        },
+        lore2: {
+            title: "Concoction",
+            body() { return "You feel light-headed as the concoction begins to take a toll on your body."},
+            unlocked() {
+            if (hasUpgrade(this.layer, 31) && !hasUpgrade(this.layer, 13)) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        },
+        hint1: {
+            title: "Timing",
+            body() { return "Sometimes a path walked previously was unfruitful because the steps you took were in the wrong order. Perhaps there are more possibilities than you initially concieved of."},
+            unlocked() {
+                if (hasUpgrade(this.layer, 33)) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        },
     },
     upgrades: {
         11: {
