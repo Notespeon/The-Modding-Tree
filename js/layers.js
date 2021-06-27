@@ -33,7 +33,10 @@ addLayer("s", {
         if ((player.points < 0.02 && player.points != 0) || (player["m"].points < 0.1 && player["m"].points != 0)) {
             player.tab = "s"
             return true
-        } else {
+        } else if (player. points == 0 || player["m"].points == 0) {
+            return true
+        } 
+        else {
             return false
         }
     },
