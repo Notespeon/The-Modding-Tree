@@ -5,7 +5,6 @@ addLayer("s", {
     startData() { return {
         unlocked: true,
 		points: new Decimal(0),
-        firstTime: true,
     }},
     color: "#fccd12",
     requires: new Decimal(0), // Can be a function that takes requirement increases into account
@@ -30,11 +29,9 @@ addLayer("s", {
         return
     },
     prestigeNotify() {
-        if (player["m"].points == 0) {
-            if (player[this.layer].firstTime == true && player[this.layer].points == 0) {
-                player[this.layer].firstTime = false
-                player.tab = "s"
-            }
+        //super hacky fix, need to change this later
+        if ((player.points < 0.02 && player.points != 0) || (player["m"].points < 0.1 && player["m"].points != 0)) {
+            player.tab = "s"
             return true
         } else {
             return false
@@ -46,13 +43,26 @@ addLayer("s", {
     ],
     layerShown(){return true},
     infoboxes: {
-        lore: {
+        lore1: {
             title: "Failure",
             body() { return "Failure is inevitable; with so many branching paths, it's inevitable that you eventually take the wrong one. However, trying again is simple, and you can learn from your mistakes.<br><br> (Press 's' at any time to immediately reset)"}
-        }
+        },
+        lore2: {
+            title: "The End",
+            body() { return "You didn't make it in time, a path too long, or a path too slow, regardless it all ends here. You must be quicker or smarter if you ever hope to succeed."},
+            unlocked() {
+            if (player.points == 0) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        },
     },
+
     tabFormat: [
-        ["infobox", "lore"],
+        ["infobox", "lore1"],
+        ["infobox", "lore2"],
         "main-display",
         "prestige-button",
         "resource-display"
@@ -106,10 +116,17 @@ addLayer("m", {
     hotkeys: [
         // {key: "m", description: "M: ???", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
-    layerShown(){return true},
+    layerShown() {
+        if (player.points > 0) {
+            return true
+        } else {
+            return false
+        }
+    },
     tabFormat: [
         ["infobox", "lore1"],
         ["infobox", "lore2"],
+        ["infobox", "lore3"],
         ["infobox", "hint1"],
         "main-display",
         "resource-display",
@@ -118,7 +135,7 @@ addLayer("m", {
     infoboxes: {
         lore1: {
             title: "The Beginning",
-            body() { return "You wake up with visions of beings beyond your comprehensions. The memory of these visions is rapidly fading. You feel the urgent need to remember, that if these memories fade something terrible will happen.<br><br>Your uncle and his friend stare at you from across the room, they both look terrified. You notice from across the room that the door leading outside is slightly ajar. Your uncle's friend is holding a bag with a red cross on it, but he has a loose grip on it."}
+            body() { return "You wake up with visions of beings beyond your comprehensions. The memory of these visions is rapidly fading. You feel the urgent need to remember, that if these memories fade something terrible will happen.<br><br>Your uncle and his friend stare at you from across the room, they both look terrified. Looking around, you notice that the door leading outside is slightly ajar. Your uncle's friend is holding a bag with a red cross on it, but he has a loose grip on it."}
         },
         lore2: {
             title: "Concoction",
@@ -131,9 +148,20 @@ addLayer("m", {
                 }
             }
         },
+        lore3: {
+            title: "Dreams",
+            body() { return "As you drift off and begin to dream, the memories solidify, those that were lost begin to return."},
+            unlocked() {
+            if (hasUpgrade(this.layer, 13) && !hasUpgrade(this.layer, 15)) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        },
         hint1: {
             title: "Timing",
-            body() { return "Sometimes a path walked previously was unfruitful because the steps you took were in the wrong order. Perhaps there are more possibilities than you initially concieved of."},
+            body() { return "A moment of clarity: 'Sometimes a path walked previously was unfruitful because the steps you took were in the wrong order. Perhaps there are more possibilities than you initially concieved of.'"},
             unlocked() {
                 if (hasUpgrade(this.layer, 33)) {
                     return true
@@ -365,7 +393,7 @@ addLayer("m", {
             }
         },
         34: {
-            title: "Convince your uncle to drink it",
+            title: "Convince your uncle to drink the concoction",
             description: "You're not sure how you'll do this, but you will.",
             cost: new Decimal(20),
             unlocked() {
@@ -381,7 +409,7 @@ addLayer("m", {
             }
         },
         35: {
-            title: "Convince your uncle to drink it",
+            title: "Convince your uncle to drink the concoction",
             description: "You're not sure how you'll do this, but you will.",
             cost: new Decimal(20),
             unlocked() {
@@ -397,7 +425,7 @@ addLayer("m", {
             }
         },
         36: {
-            title: "Convince your uncle to drink it",
+            title: "Convince your uncle to drink the concoction",
             description: "You're not sure how you'll do this, but you will.",
             cost: new Decimal(20),
             unlocked() {
@@ -412,9 +440,26 @@ addLayer("m", {
                 player.points = player.points.add(-20)
             }
         },
+        37: {
+            title: "Explain Further",
+            description: "Seems like this explanation might take a bit longer than you thought, the fog sets in.",
+            cost: new Decimal(40),
+            unlocked() {
+                if ((hasUpgrade(this.layer, 14)
+                    && !hasUpgrade(this.layer, 15))
+                    || hasUpgrade(this.layer, 37)) {
+                    return true
+                } else {
+                    return false
+                }
+            },
+            onPurchase() {
+                player.points = player.points.add(-200)
+            }
+        },
         41: {
-            title: "Victory!",
-            description: "Placeholder for more content, just want to let you know you did it!",
+            title: "Two thousand, one hundred and seventy-four steps",
+            description: "Begin your adventure. (Unlocks the next layer)",
             cost: new Decimal(20),
             unlocked() {
                 if (hasUpgrade(this.layer, 15)
@@ -428,5 +473,6 @@ addLayer("m", {
                 player.points = player.points.add(3600)
             }
         },
+        
     }
 })
