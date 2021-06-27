@@ -26,21 +26,6 @@ addLayer("s", {
         return true
     },
     onPrestige(gain) {
-        player["m"].bagObtained = false
-        player["m"].thinking = false
-        player["m"].sleeping = false
-        player["m"].mixed1 = false
-        player["m"].mixed2 = false
-        player["m"].mixed3 = false
-        player["m"].greenLiquidDrunk = false
-        player["m"].whitePowderUsed = false
-        player["m"].houseLeft = false
-        player["m"].concotion1used = false
-        player["m"].concotion2used = false
-        player["m"].concotion3used = false
-        player["m"].concotion1wasted = false
-        player["m"].concotion2wasted = false
-        player["m"].concotion3wasted = false
         return
     },
     prestigeNotify() {
@@ -48,7 +33,7 @@ addLayer("s", {
     },
     row: 5, // Row the layer is in on the tree (0 is the first row)
     hotkeys: [
-        // {key: "s", description: "S: ???", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        {key: "s", description: "S: Reset back to the beginning", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
     layerShown(){return true},
     infoboxes: {
@@ -93,11 +78,11 @@ addLayer("m", {
         return false
     },
     passiveGeneration() {
-        let gen = new Decimal(-5)
-        if (player[this.layer].thinking) {
-            gen = new Decimal(-1)
+        let gen = new Decimal(-10)
+        if (hasUpgrade(this.layer, 11)) {
+            gen = new Decimal(-2)
         }
-        if (player[this.layer].sleeping) {
+        if (hasUpgrade(this.layer, 31)) {
             gen = new Decimal(0)
         }
         return gen
@@ -116,7 +101,7 @@ addLayer("m", {
     infoboxes: {
         lore: {
             title: "The Beginning",
-            body() { return "You wake up with visions of beings beyond your comprehensions. The memory of these visions is rapidly fading. You feel the urgent need to remember, that if these memories fade something terrible will happen. Your uncle stares at you from across the room, he looks terrified."}
+            body() { return "You wake up with visions of beings beyond your comprehensions. The memory of these visions is rapidly fading. You feel the urgent need to remember, that if these memories fade something terrible will happen.<br><br> Your uncle and his friend stare at you from across the room, they both look terrified. You notice from across the room that the door leading outside is slightly ajar. Your uncle's friend is holding a bag with a red cross on it, but he has a loose grip on it."}
         }
     },
     upgrades: {
@@ -126,7 +111,6 @@ addLayer("m", {
             cost: new Decimal(20),
             onPurchase() {
                 player.points = player.points.add(-20)
-                player[this.layer].thinking = true
             }
         },
         12: {
@@ -134,7 +118,7 @@ addLayer("m", {
             description: "Seems kind of like giving up.",
             cost: new Decimal(20),
             unlocked() {
-                if (!player[this.layer].houseLeft) {
+                if (!hasUpgrade(this.layer, 14) || hasUpgrade(this.layer, 12)) {
                     return true
                 } else {
                     return false
@@ -149,7 +133,7 @@ addLayer("m", {
             description: "They deserve to know.",
             cost: new Decimal(20),
             unlocked() {
-                if (!player[this.layer].houseLeft) {
+                if (!hasUpgrade(this.layer, 14) || hasUpgrade(this.layer, 13)) {
                     return true
                 } else {
                     return false
@@ -165,7 +149,6 @@ addLayer("m", {
             cost: new Decimal(20),
             onPurchase() {
                 player.points = player.points.add(-20)
-                player[this.layer].houseLeft = true
             }
         },
         15: {
@@ -173,7 +156,7 @@ addLayer("m", {
             description: "There could be something useful in there.",
             cost: new Decimal(20),
             unlocked() {
-                if (!player[this.layer].houseLeft || player[this.layer].bagObtained) {
+                if (!hasUpgrade(this.layer, 14) || hasUpgrade(this.layer, 15)) {
                     return true
                 } else {
                     return false
@@ -189,11 +172,11 @@ addLayer("m", {
             description: "You might be able to use this mixture for something.",
             cost: new Decimal(20),
             unlocked() {
-                if (player[this.layer].bagObtained 
-                    && !player[this.layer].whitePowderUsed 
-                    && !player[this.layer].greenLiquidDrunk
-                    && !player[this.layer].mixed2
-                    && !player[this.layer].mixed3) {
+                if (hasUpgrade(this.layer, 15)
+                    && !hasUpgrade(this.layer, 25)
+                    && !hasUpgrade(this.layer, 24)
+                    && !hasUpgrade(this.layer, 22)
+                    && !hasUpgrade(this.layer, 23)) {
                     return true
                 } else {
                     return false
@@ -209,10 +192,10 @@ addLayer("m", {
             description: "You might be able to use this mixture for something.",
             cost: new Decimal(20),
             unlocked() {
-                if (player[this.layer].bagObtained 
-                    && !player[this.layer].greenLiquidDrunk
-                    && !player[this.layer].mixed1
-                    && !player[this.layer].mixed3) {
+                if (hasUpgrade(this.layer, 15)
+                    && !hasUpgrade(this.layer, 24)
+                    && !hasUpgrade(this.layer, 21)
+                    && !hasUpgrade(this.layer, 23)) {
                     return true
                 } else {
                     return false
@@ -228,10 +211,10 @@ addLayer("m", {
             description: "You might be able to use this mixture for something.",
             cost: new Decimal(20),
             unlocked() {
-                if (player[this.layer].bagObtained 
-                    && !player[this.layer].whitePowderUsed
-                    && !player[this.layer].mixed1
-                    && !player[this.layer].mixed2) {
+                if (hasUpgrade(this.layer, 15) 
+                    && !hasUpgrade(this.layer, 25)
+                    && !hasUpgrade(this.layer, 21)
+                    && !hasUpgrade(this.layer, 22)) {
                     return true
                 } else {
                     return false
@@ -247,9 +230,9 @@ addLayer("m", {
             description: "Looks kind of gross.",
             cost: new Decimal(20),
             unlocked() {
-                if (player[this.layer].bagObtained 
-                    && !player[this.layer].mixed1 
-                    && !player[this.layer].mixed2) {
+                if (hasUpgrade(this.layer, 15) 
+                    && !hasUpgrade(this.layer, 21) 
+                    && !hasUpgrade(this.layer, 22)) {
                     return true
                 } else {
                     return false
@@ -265,9 +248,9 @@ addLayer("m", {
             description: "Maybe it's not what it looks like.",
             cost: new Decimal(20),
             unlocked() {
-                if (player[this.layer].bagObtained 
-                    && !player[this.layer].mixed1 
-                    && !player[this.layer].mixed3) {
+                if (hasUpgrade(this.layer, 15) 
+                    && !hasUpgrade(this.layer, 21) 
+                    && !hasUpgrade(this.layer, 23)) {
                     return true
                 } else {
                     return false
@@ -283,8 +266,8 @@ addLayer("m", {
             description: "Looks really gross.",
             cost: new Decimal(20),
             unlocked() {
-                if (player[this.layer].mixed1
-                    && !player[this.layer].concotion1wasted) {
+                if (hasUpgrade(this.layer, 21)
+                    && !hasUpgrade(this.layer, 34)) {
                     return true
                 } else {
                     return false
@@ -292,8 +275,6 @@ addLayer("m", {
             },
             onPurchase() {
                 player.points = player.points.add(-20)
-                player[this.layer].sleeping = true
-                player[this.layer].concotion1used = true
             }
         },
         32: {
@@ -301,8 +282,8 @@ addLayer("m", {
             description: "Looks really gross.",
             cost: new Decimal(20),
             unlocked() {
-                if (player[this.layer].mixed2
-                    && !player[this.layer].concotion2wasted) {
+                if (hasUpgrade(this.layer, 22)
+                    && !hasUpgrade(this.layer, 35)) {
                     return true
                 } else {
                     return false
@@ -318,8 +299,8 @@ addLayer("m", {
             description: "Looks really gross.",
             cost: new Decimal(20),
             unlocked() {
-                if (player[this.layer].mixed3
-                    && !player[this.layer].concotion3wasted) {
+                if (hasUpgrade(this.layer, 23)
+                    && !hasUpgrade(this.layer, 36)) {
                     return true
                 } else {
                     return false
@@ -327,7 +308,6 @@ addLayer("m", {
             },
             onPurchase() {
                 player.points = player.points.add(-20)
-                player[this.layer].concotion3used = true
             }
         },
         34: {
@@ -335,8 +315,8 @@ addLayer("m", {
             description: "You're not sure how you'll do this, but you will.",
             cost: new Decimal(20),
             unlocked() {
-                if (player[this.layer].mixed1
-                    && !player[this.layer].concotion1used) {
+                if (hasUpgrade(this.layer, 21)
+                    && !hasUpgrade(this.layer, 31)) {
                     return true
                 } else {
                     return false
@@ -344,7 +324,6 @@ addLayer("m", {
             },
             onPurchase() {
                 player.points = player.points.add(-20)
-                player[this.layer].concotion1wasted = true
             }
         },
         35: {
@@ -352,8 +331,8 @@ addLayer("m", {
             description: "You're not sure how you'll do this, but you will.",
             cost: new Decimal(20),
             unlocked() {
-                if (player[this.layer].mixed2
-                    && !player[this.layer].concotion2used) {
+                if (hasUpgrade(this.layer, 22)
+                    && !hasUpgrade(this.layer, 32)) {
                     return true
                 } else {
                     return false
@@ -361,7 +340,6 @@ addLayer("m", {
             },
             onPurchase() {
                 player.points = player.points.add(-20)
-                player[this.layer].concotion2wasted = true
             }
         },
         36: {
@@ -369,8 +347,8 @@ addLayer("m", {
             description: "You're not sure how you'll do this, but you will.",
             cost: new Decimal(20),
             unlocked() {
-                if (player[this.layer].mixed3
-                    && !player[this.layer].concotion3used) {
+                if (hasUpgrade(this.layer, 23)
+                    && !hasUpgrade(this.layer, 33)) {
                     return true
                 } else {
                     return false
@@ -378,7 +356,6 @@ addLayer("m", {
             },
             onPurchase() {
                 player.points = player.points.add(-20)
-                player[this.layer].concotion3wasted = true
             }
         },
     }
