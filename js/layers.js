@@ -50,7 +50,7 @@ addLayer("m", {
     position: 1, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
     startData() { return {
         unlocked: true,
-        points: new Decimal(120),
+        points: new Decimal(100),
     }},
     color: "#f2aeb1",
     requires: new Decimal(0), // Can be a function that takes requirement increases into account
@@ -82,8 +82,8 @@ addLayer("m", {
         if (hasUpgrade(this.layer, 11)) {
             gen = new Decimal(-2)
         }
-        if (hasUpgrade(this.layer, 31)) {
-            gen = new Decimal(0)
+        if (hasUpgrade(this.layer, 13)) {
+            gen = new Decimal(0.5)
         }
         return gen
     },
@@ -118,7 +118,7 @@ addLayer("m", {
             description: "Seems kind of like giving up.",
             cost: new Decimal(20),
             unlocked() {
-                if (!hasUpgrade(this.layer, 14) || hasUpgrade(this.layer, 12)) {
+                if ((!hasUpgrade(this.layer, 15) && !hasUpgrade(this.layer, 31)) || hasUpgrade(this.layer, 12)) {
                     return true
                 } else {
                     return false
@@ -129,11 +129,11 @@ addLayer("m", {
             }
         },
         13: {
-            title: "Explain everything",
-            description: "They deserve to know.",
+            title: "Lay back down",
+            description: "Seems kind of like giving up.",
             cost: new Decimal(20),
             unlocked() {
-                if (!hasUpgrade(this.layer, 14) || hasUpgrade(this.layer, 13)) {
+                if ((!hasUpgrade(this.layer, 15) || hasUpgrade(this.layer, 13)) && !hasUpgrade(this.layer, 12) && hasUpgrade(this.layer, 31)) {
                     return true
                 } else {
                     return false
@@ -144,6 +144,21 @@ addLayer("m", {
             }
         },
         14: {
+            title: "Explain everything",
+            description: "They deserve to know.",
+            cost: new Decimal(20),
+            unlocked() {
+                if (!hasUpgrade(this.layer, 15) || hasUpgrade(this.layer, 14)) {
+                    return true
+                } else {
+                    return false
+                }
+            },
+            onPurchase() {
+                player.points = player.points.add(-20)
+            }
+        },
+        15: {
             title: "Leave the house",
             description: "There might be more to do outside.",
             cost: new Decimal(20),
@@ -151,12 +166,12 @@ addLayer("m", {
                 player.points = player.points.add(-20)
             }
         },
-        15: {
+        16: {
             title: "Steal the medicine bag",
             description: "There could be something useful in there.",
             cost: new Decimal(20),
             unlocked() {
-                if (!hasUpgrade(this.layer, 14) || hasUpgrade(this.layer, 15)) {
+                if (!hasUpgrade(this.layer, 15) || hasUpgrade(this.layer, 16)) {
                     return true
                 } else {
                     return false
@@ -172,7 +187,7 @@ addLayer("m", {
             description: "You might be able to use this mixture for something.",
             cost: new Decimal(20),
             unlocked() {
-                if (hasUpgrade(this.layer, 15)
+                if (hasUpgrade(this.layer, 16)
                     && !hasUpgrade(this.layer, 25)
                     && !hasUpgrade(this.layer, 24)
                     && !hasUpgrade(this.layer, 22)
@@ -192,7 +207,7 @@ addLayer("m", {
             description: "You might be able to use this mixture for something.",
             cost: new Decimal(20),
             unlocked() {
-                if (hasUpgrade(this.layer, 15)
+                if (hasUpgrade(this.layer, 16)
                     && !hasUpgrade(this.layer, 24)
                     && !hasUpgrade(this.layer, 21)
                     && !hasUpgrade(this.layer, 23)) {
@@ -211,7 +226,7 @@ addLayer("m", {
             description: "You might be able to use this mixture for something.",
             cost: new Decimal(20),
             unlocked() {
-                if (hasUpgrade(this.layer, 15) 
+                if (hasUpgrade(this.layer, 16) 
                     && !hasUpgrade(this.layer, 25)
                     && !hasUpgrade(this.layer, 21)
                     && !hasUpgrade(this.layer, 22)) {
@@ -230,7 +245,7 @@ addLayer("m", {
             description: "Looks kind of gross.",
             cost: new Decimal(20),
             unlocked() {
-                if (hasUpgrade(this.layer, 15) 
+                if (hasUpgrade(this.layer, 16) 
                     && !hasUpgrade(this.layer, 21) 
                     && !hasUpgrade(this.layer, 22)) {
                     return true
@@ -248,7 +263,7 @@ addLayer("m", {
             description: "Maybe it's not what it looks like.",
             cost: new Decimal(20),
             unlocked() {
-                if (hasUpgrade(this.layer, 15) 
+                if (hasUpgrade(this.layer, 16) 
                     && !hasUpgrade(this.layer, 21) 
                     && !hasUpgrade(this.layer, 23)) {
                     return true
@@ -356,6 +371,22 @@ addLayer("m", {
             },
             onPurchase() {
                 player.points = player.points.add(-20)
+            }
+        },
+        41: {
+            title: "Victory!",
+            description: "Placeholder for more content, just want to let you know you did it!",
+            cost: new Decimal(20),
+            unlocked() {
+                if (hasUpgrade(this.layer, 15)
+                    && hasUpgrade(this.layer, 13)) {
+                    return true
+                } else {
+                    return false
+                }
+            },
+            onPurchase() {
+                player.points = player.points.add(3600)
             }
         },
     }
